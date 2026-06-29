@@ -61,7 +61,7 @@ const stages = [
             }, Math.random() * 1500 + 1000)
         },
         onClick: () => {
-            
+
             if (mainButton.textContent.includes("RAT")) {
                 nextStage()
             } else if (mainButton.textContent.includes("CAT")) {
@@ -195,22 +195,41 @@ const stages = [
 
 ]
 /*-------------------------------- Functions --------------------------------*/
-function updateStageUI(){
+function playSound(){
 
 }
 
-function resetStageTimer(second){
+function updateStageUI() {
+    stageClicks = 0
+    const currentStage = stages[stageIndex]
+
+    if (currentStage) {
+        interactionArea.innerHTML = `<button id="main-button" class="tempting-button"></button>`
+        setButtonListener()
+
+        dialogueText.textContent = currentStage.dialogue || ""
+        mainButton.textContent = currentStage.buttonText || "CLICK"
+
+        if (currentStage.onEnter) currentStage.onEnter()
+        resetStageTimer(currentStage.duration || 10)
+    }
 
 }
-function nextStage(){
-    
+
+function resetStageTimer(second) {
+    updateStageUI()
+    timeLeft = stages.duration
+}
+function nextStage() {
+    stageIndex++
+    updateStageUI()
 }
 
 function triggerGameOver() {
 
 }
 
-function triggerFinalStageMath(){
+function triggerFinalStageMath() {
 
 }
 /*----------------------------- Event Listeners -----------------------------*/
@@ -226,7 +245,7 @@ function handleButtonClick() {
         gameStarted = true
         if (gameInstruction) gameInstruction.classList.add('hidden')
         playSound('click')
-        updateStageUI() 
+        updateStageUI()
         return
     }
 
