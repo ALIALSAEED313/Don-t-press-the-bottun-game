@@ -46,7 +46,7 @@ const stages = [
         buttonText: "WAIT FOR IT...",
         duration: 10,
         onEnter: () => {
-            
+
             setTimeout(() => {
                 if (stageIndex === 1) {
                     mainButton.textContent = "🐈 CAT! DON'T CLICK IT! 🐈"
@@ -92,12 +92,12 @@ const stages = [
         onEnter: () => {
             // 1. Pick a random target number of clicks between 1 and 10
             targetClicks = Math.floor(Math.random() * 10) + 1
-            
+
             // 2. Build a random subtraction equation that equals our target
             // Example: If target is 4, offset is 3, equation is: 7 - 3 = 4
             const offset = Math.floor(Math.random() * 5) + 1
             const startingNum = targetClicks + offset
-            
+
             dialogueText.textContent = `Click ${startingNum} - ${offset} = ____ times`
         },
         onClick: () => {
@@ -116,7 +116,7 @@ const stages = [
     },
     {
         //stage 5 = User have to remember the number that display on the screen
-        dialogue:"",
+        dialogue: "",
         buttonText: "I memorized it.",
         duration: 10,
         onEnter: () => {
@@ -135,8 +135,60 @@ const stages = [
         }
     },
     {
-        //stage 7 = 
-        
+        //stage 7 = the user should click upon the equation 
+        buttonText: "",
+        duration: 20,
+        onEnter: () => {
+            const num1 = Math.floor(Math.random() * 10) + 1
+            const num2 = Math.floor(Math.random() * 10) + 1
+            const correctAnswer = num1 + num2
+
+            dialogueText.textContent = `Quick math break! What is ${num1} + ${num2}?`
+
+            interactionArea.innerHTML = `
+                <input type="number" id="mid-game-guess" placeholder="?" style="padding: 10px; font-size: 1.2rem; border-radius: 5px; border: none; margin-bottom: 15px; text-align: center; color: black; width: 80px;"><br>
+                <button id="submit-mid-guess" class="tempting-button" style="background-color: #3b82f6; box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4); padding: 12px 30px; font-size: 1.1rem;">Submit</button>`
+
+            document.querySelector('#submit-mid-guess').addEventListener('click', () => {
+                const playerGuess = parseInt(document.querySelector('#mid-game-guess').value)
+                if (playerGuess === correctAnswer) {
+                    playSound('click')
+                    nextStage()
+                } else {
+                    triggerGameOver(`Wrong math! ${num1} + ${num2} is not ${playerGuess || 0}.`)
+                }
+            })
+
+
+        },
+        onClick: () => { }
+    },
+
+    {
+        //stage 8 =
+        dialogue: "",
+        buttonText: "Got it.",
+        duration: 7,
+        onEnter: () => {
+            const decoyNumber = Math.floor(Math.random() * 89) + 11
+            dialogueText.textContent = `Oh look, another completely useless number: ${decoyNumber}`
+        },
+        onClick: () => nextStage()
+    },
+
+    {
+        // stage 9 = just a question 
+        dialogue: "Did you remember it?",
+        buttonText: "Yes, obviously.",
+        duration: 10,
+        onClick: () => nextStage()
+    },
+    {
+        //stage 10 = user must type the number that he remember minus other random number (equation)
+        dialogue: "Still? Are you absolutely sure you remember it?",
+        buttonText: "JUST LET ME WIN ALREADY",
+        duration: 10,
+        onClick: () => triggerFinalStageMath()
     }
 
 
