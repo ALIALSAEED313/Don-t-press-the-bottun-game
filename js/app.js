@@ -61,7 +61,7 @@ const stages = [
             }, Math.random() * 1500 + 1000)
         },
         onClick: () => {
-            // 🎯 Evaluate exactly what text was on the button the millisecond they clicked
+            
             if (mainButton.textContent.includes("RAT")) {
                 nextStage()
             } else if (mainButton.textContent.includes("CAT")) {
@@ -195,9 +195,49 @@ const stages = [
 
 ]
 /*-------------------------------- Functions --------------------------------*/
+function updateStageUI(){
 
+}
+
+function resetStageTimer(second){
+
+}
+function nextStage(){
+    
+}
+
+function triggerGameOver() {
+
+}
+
+function triggerFinalStageMath(){
+
+}
 /*----------------------------- Event Listeners -----------------------------*/
+function setButtonListener() {
+    mainButton = document.querySelector('#main-button')
+    if (mainButton) {
+        mainButton.addEventListener('click', handleButtonClick)
+    }
+}
 
+function handleButtonClick() {
+    if (!gameStarted) {
+        gameStarted = true
+        if (gameInstruction) gameInstruction.classList.add('hidden')
+        playSound('click')
+        updateStageUI() 
+        return
+    }
+
+    stageClicks++
+    totalClicks++
+    playSound('click')
+
+    if (stages[stageIndex]) {
+        stages[stageIndex].onClick()
+    }
+}
 /*----------------------------- Theme Manager -----------------------------*/
 if (themeToggleBtn) {
     themeToggleBtn.addEventListener('click', () => {
