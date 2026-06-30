@@ -195,7 +195,7 @@ const stages = [
 
 ]
 /*-------------------------------- Functions --------------------------------*/
-function playSound(){
+function playSound(type){
 
 }
 
@@ -217,20 +217,54 @@ function updateStageUI() {
 }
 
 function resetStageTimer(second) {
-    updateStageUI()
-    timeLeft = stages.duration
+    if (globalTimer) clearInterval(globalTimer)
+
+        timeLeft = second
+        timerDisplay.textContent = `Time Left: ${timeLeft}s`
+        timerDisplay.classList.remove('hidden')
+
+        globalTimer = setInterval(() => {
+            timeLeft--
+
+            if (timeLeft > 0){
+                timerDisplay.textContent = `Time Left: ${timeLeft}s`
+
+            } else {
+                clearInterval(globalTimer)
+                timerDisplay.textContent = `Time Left: 0s`
+
+                const currentStage = stages[stageIndex]
+                if (currentStage && currentStage.onTimeout) {
+                    currentStage.onTimeout()
+                } else {
+                    triggerGameOver("Time ran out!")
+                }
+            }
+        }, 1000)
 }
 function nextStage() {
     stageIndex++
     updateStageUI()
 }
 
-function triggerGameOver() {
+function triggerGameOver(reasonText) {
+    clearInterval(globalTimer)
+    timerDisplay.classList.add('hidden')
 
+    dialogueText.textContent = `${reasonText} Back to the beginning!`
+    interactionArea.innerHTML = `<button id="main-button" class="tempting-button">START GAME</button>`
+
+    stageIndex = 0
+    stageClicks = 0
+    totalClicks = 0
+    gameStarted = false
+
+    if (gameInstruction) gameInstruction.classList.remove('hidden')
+        setButtonListener()
 }
 
 function triggerFinalStageMath() {
-
+    
 }
 /*----------------------------- Event Listeners -----------------------------*/
 function setButtonListener() {
@@ -264,3 +298,7 @@ if (themeToggleBtn) {
         themeToggleBtn.textContent = bodyElement.classList.contains('light-mode') ? '🌙' : '☀️'
     })
 }
+
+setButtonListener()
+timerDisplay.classList.add('hidden')
+mainButton.textContent = "START GAME"
