@@ -123,19 +123,20 @@ const stages = [
             secretNumber = Math.floor(Math.random() * 90) + 10
             dialogueText.textContent = `Remember the number: ${secretNumber}`
         },
-        onClick: () => nextStage()
+        onClick: () => nextStage(),
+        onTimeout: () => nextStage()
     },
     {
         //stage 6 = the user should click 15 times before the time runs out
         dialogue: "QUICK! System glitch! Click 15 times before time runs out!",
         buttonText: "TAP!",
-        duration: 7,
+        duration: 8,
         onClick: () => {
             if (stageClicks >= 15) nextStage()
         }
     },
     {
-        //stage 7 = the user should click upon the equation 
+        //stage 7 = the user should write the answer upon the equation)
         buttonText: "",
         duration: 20,
         onEnter: () => {
@@ -165,7 +166,7 @@ const stages = [
     },
 
     {
-        //stage 8 =
+        //stage 8 = this stage is displaying another useless number (the goal is to make the user forget about the first number)
         dialogue: "",
         buttonText: "Got it.",
         duration: 7,
@@ -173,7 +174,8 @@ const stages = [
             const decoyNumber = Math.floor(Math.random() * 89) + 11
             dialogueText.textContent = `Oh look, another completely useless number: ${decoyNumber}`
         },
-        onClick: () => nextStage()
+        onClick: () => nextStage(),
+        onTimeout: () => nextStage()
     },
 
     {
@@ -181,21 +183,72 @@ const stages = [
         dialogue: "Still remember the first number?",
         buttonText: "Yes, obviously.",
         duration: 10,
-        onClick: () => nextStage()
+        onClick: () => nextStage(),
+        onTimeout: () => nextStage()
     },
     {
         //stage 10 = user must type the number that he remember minus other random number (equation)
         dialogue: "Still? Are you absolutely sure you remember it?",
         buttonText: "JUST LET ME WIN ALREADY",
         duration: 10,
-        onClick: () => triggerFinalStageMath()
+        onClick: () => triggerFinalStageMath(),
+        onTimeout: () => nextStage()
     }
 
 
 
 ]
 /*-------------------------------- Functions --------------------------------*/
-function playSound(type){
+function playSound(type) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext
+    if (!AudioContext) return
+
+    const ctx = new AudioContext()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+
+    if (type === 'click') {
+        osc.frequency.setValueAtTime(450, ctx.currentTime)
+        gain.gain.setValueAtTime(0.1, ctx.currentTime)
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08)
+        osc.start()
+        osc.stop(ctx.currentTime + 0.08)
+    }
+    else if (type === 'tick') {
+        osc.frequency.setValueAtTime(700, ctx.currentTime)
+        gain.gain.setValueAtTime(0.04, ctx.currentTime)
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.03)
+        osc.start()
+        osc.stop(ctx.currentTime + 0.03)
+    }
+    else if (type === 'fail') {
+        osc.frequency.setValueAtTime(280, ctx.currentTime)
+        osc.frequency.linearRampToValueAtTime(80, ctx.currentTime + 0.4)
+        gain.gain.setValueAtTime(0.25, ctx.currentTime)
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4)
+        osc.start()
+        osc.stop(ctx.currentTime + 0.4)
+    }
+    else if (type === 'win') {
+        const notes = [523.25, 659.25, 783.99, 1046.50]
+        notes.forEach((freq, index) => {
+            const time = ctx.currentTime + (index * 0.08)
+            const noteOsc = ctx.createOscillator()
+            const noteGain = ctx.createGain()
+
+            noteOsc.frequency.setValueAtTime(freq, time)
+            noteGain.gain.setValueAtTime(0.1, time)
+            noteGain.gain.exponentialRampToValueAtTime(0.01, time + 0.15)
+
+            noteOsc.connect(noteGain)
+            noteGain.connect(ctx.destination)
+            noteOsc.start(time)
+            noteOsc.stop(time + 0.15)
+        })
+    }
 
 }
 
@@ -219,28 +272,29 @@ function updateStageUI() {
 function resetStageTimer(second) {
     if (globalTimer) clearInterval(globalTimer)
 
-        timeLeft = second
-        timerDisplay.textContent = `Time Left: ${timeLeft}s`
-        timerDisplay.classList.remove('hidden')
+    timeLeft = second
+    timerDisplay.textContent = `Time Left: ${timeLeft}s`
+    timerDisplay.classList.remove('hidden')
 
-        globalTimer = setInterval(() => {
-            timeLeft--
+    globalTimer = setInterval(() => {
+        timeLeft--
+        playSound('tick')
 
-            if (timeLeft > 0){
-                timerDisplay.textContent = `Time Left: ${timeLeft}s`
+        if (timeLeft > 0) {
+            timerDisplay.textContent = `Time Left: ${timeLeft}s`
 
+        } else {
+            clearInterval(globalTimer)
+            timerDisplay.textContent = `Time Left: 0s`
+
+            const currentStage = stages[stageIndex]
+            if (currentStage && currentStage.onTimeout) {
+                currentStage.onTimeout()
             } else {
-                clearInterval(globalTimer)
-                timerDisplay.textContent = `Time Left: 0s`
-
-                const currentStage = stages[stageIndex]
-                if (currentStage && currentStage.onTimeout) {
-                    currentStage.onTimeout()
-                } else {
-                    triggerGameOver("Time ran out!")
-                }
+                triggerGameOver("Time ran out!")
             }
-        }, 1000)
+        }
+    }, 1000)
 }
 function nextStage() {
     stageIndex++
@@ -258,9 +312,10 @@ function triggerGameOver(reasonText) {
     stageClicks = 0
     totalClicks = 0
     gameStarted = false
+    playSound('fail')
 
     if (gameInstruction) gameInstruction.classList.remove('hidden')
-        setButtonListener()
+    setButtonListener()
 }
 
 function triggerFinalStageMath() {
@@ -284,7 +339,7 @@ function triggerFinalStageMath() {
             timerDisplay.classList.add('hidden')
             dialogueText.textContent = "🎉 YOU WON THE GAME! 🎉"
             interactionArea.innerHTML = `<p style='color: #10b981; font-weight: bold; font-size: 1.5rem;'>Brilliant memory!</p>`
-
+            playSound('win')
         } else {
             triggerGameOver(`Wrong! The answer was ${correctAnswer}.`)
         }
@@ -306,6 +361,7 @@ function handleButtonClick() {
         return
     }
 
+    playSound('click')
     stageClicks++
     totalClicks++
 

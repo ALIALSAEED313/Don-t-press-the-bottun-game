@@ -60,7 +60,7 @@ body {
 
 .game-instruction h3 {
     font-size: 1.1rem;
-    color: #f43f5e; 
+    color: #f43f5e;
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -83,11 +83,18 @@ body {
 }
 
 .dialogue-box {
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     margin-bottom: 35px;
+    padding: 20px;
     min-height: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: background-color 0.3s, border-color 0.3s;
+
 }
 
 #dialogue-text {
@@ -145,7 +152,7 @@ body.light-mode #instructions-text {
 }
 
 body.light-mode .timer-text {
-    color: #d97706; 
+    color: #d97706;
 }
 
 body.light-mode #dialogue-text {
