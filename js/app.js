@@ -23,7 +23,7 @@ console.log('mainButton')
 let gameStarted = false
 let stageIndex = 0
 let stageClicks = 0
-let tatalClicks = 0
+let totalClicks = 0
 let secretNumbers = 0
 let minusNumber = 0
 let globalTimer = null
@@ -49,12 +49,12 @@ const stages = [
 
             setTimeout(() => {
                 if (stageIndex === 1) {
-                    mainButton.textContent = "🐈 CAT! DON'T CLICK IT! 🐈"
+                    mainButton.textContent = "🐈"
 
                     // ⏰ Step 2: Swap the cat out for the actual RAT 2 seconds later
                     setTimeout(() => {
                         if (stageIndex === 1) {
-                            mainButton.textContent = "🐀 RAT! CLICK IT! 🐀"
+                            mainButton.textContent = "🐀"
                         }
                     }, 2000)
                 }
@@ -62,9 +62,9 @@ const stages = [
         },
         onClick: () => {
 
-            if (mainButton.textContent.includes("RAT")) {
+            if (mainButton.textContent.includes("🐀")) {
                 nextStage()
-            } else if (mainButton.textContent.includes("CAT")) {
+            } else if (mainButton.textContent.includes("🐈")) {
                 triggerGameOver("Gotcha! That was a cat! I explicitly said click a RAT.")
             } else {
                 triggerGameOver("Too early! There wasn't even an animal on the screen yet!")
@@ -129,7 +129,7 @@ const stages = [
         //stage 6 = the user should click 15 times before the time runs out
         dialogue: "QUICK! System glitch! Click 15 times before time runs out!",
         buttonText: "TAP!",
-        duration: 8,
+        duration: 4,
         onClick: () => {
             if (stageClicks >= 15) nextStage()
         }
@@ -178,7 +178,7 @@ const stages = [
 
     {
         // stage 9 = just a question 
-        dialogue: "Did you remember it?",
+        dialogue: "Still remember the first number?",
         buttonText: "Yes, obviously.",
         duration: 10,
         onClick: () => nextStage()
@@ -264,7 +264,7 @@ function triggerGameOver(reasonText) {
 }
 
 function triggerFinalStageMath() {
-    
+
 }
 /*----------------------------- Event Listeners -----------------------------*/
 function setButtonListener() {
@@ -278,14 +278,12 @@ function handleButtonClick() {
     if (!gameStarted) {
         gameStarted = true
         if (gameInstruction) gameInstruction.classList.add('hidden')
-        playSound('click')
         updateStageUI()
         return
     }
 
     stageClicks++
     totalClicks++
-    playSound('click')
 
     if (stages[stageIndex]) {
         stages[stageIndex].onClick()
