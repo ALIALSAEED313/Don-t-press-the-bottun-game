@@ -24,7 +24,7 @@ let gameStarted = false
 let stageIndex = 0
 let stageClicks = 0
 let totalClicks = 0
-let secretNumbers = 0
+let secretNumber = 0
 let minusNumber = 0
 let globalTimer = null
 let timeLeft = 10
@@ -36,7 +36,7 @@ const stages = [
         //stage 0 = just dont click
         dialogue: "Do not Click The Button",
         buttonText: "CLICK",
-        duration: 10,
+        duration: 5,
         onTimeout: () => nextStage(),
         onClick: () => triggerGameOver("You clicked it! I explicitly said Not to.")
     },
@@ -129,7 +129,7 @@ const stages = [
         //stage 6 = the user should click 15 times before the time runs out
         dialogue: "QUICK! System glitch! Click 15 times before time runs out!",
         buttonText: "TAP!",
-        duration: 4,
+        duration: 7,
         onClick: () => {
             if (stageClicks >= 15) nextStage()
         }
@@ -264,7 +264,31 @@ function triggerGameOver(reasonText) {
 }
 
 function triggerFinalStageMath() {
+    clearInterval(globalTimer)
+    stageIndex = 999
+    minusNumber = Math.floor(Math.random() * 9) + 1
+    let correctAnswer = secretNumber - minusNumber
 
+    dialogueText.textContent = `What is the number I asked you to remember minus ${minusNumber}?`
+    resetStageTimer(15)
+
+    interactionArea.innerHTML = `
+        <input type="number" id="game-guess" placeholder="Your answer..." style="padding: 10px; font-size: 1.2rem; border-radius: 5px; border: none; margin-bottom: 15px; text-align: center; color: black;"><br>
+        <button id="submit-guess" class="tempting-button" style="background-color: #10b981; box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.4);">Submit Answer</button>
+    `
+    document.querySelector('#submit-guess').addEventListener('click', () => {
+        const playerGuess = parseInt(document.querySelector('#game-guess').value)
+
+        if (playerGuess === correctAnswer) {
+            clearInterval(globalTimer)
+            timerDisplay.classList.add('hidden')
+            dialogueText.textContent = "🎉 YOU WON THE GAME! 🎉"
+            interactionArea.innerHTML = `<p style='color: #10b981; font-weight: bold; font-size: 1.5rem;'>Brilliant memory!</p>`
+
+        } else {
+            triggerGameOver(`Wrong! The answer was ${correctAnswer}.`)
+        }
+    })
 }
 /*----------------------------- Event Listeners -----------------------------*/
 function setButtonListener() {
