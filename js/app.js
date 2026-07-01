@@ -36,7 +36,7 @@ const stages = [
         //stage 0 = just dont click
         dialogue: "Do not Click The Button",
         buttonText: "CLICK",
-        duration: 5,
+        duration: 3,
         onTimeout: () => nextStage(),
         onClick: () => triggerGameOver("You clicked it! I explicitly said Not to.")
     },
@@ -51,12 +51,12 @@ const stages = [
                 if (stageIndex === 1) {
                     mainButton.textContent = "🐈"
 
-                    // ⏰ Step 2: Swap the cat out for the actual RAT 2 seconds later
+                    // Step 2: Swap the cat out for the actual RAT 4 seconds later
                     setTimeout(() => {
                         if (stageIndex === 1) {
                             mainButton.textContent = "🐀"
                         }
-                    }, 2000)
+                    }, 4000)
                 }
             }, Math.random() * 1500 + 1000)
         },
@@ -172,10 +172,18 @@ const stages = [
         duration: 7,
         onEnter: () => {
             const decoyNumber = Math.floor(Math.random() * 89) + 11
-            dialogueText.textContent = `Oh look, another completely useless number: ${decoyNumber}`
+            dialogueText.textContent = `Oh look, another completely useless number: ${decoyNumber} , no need to click`
         },
         onClick: () => nextStage(),
         onTimeout: () => nextStage()
+    },
+    {
+        dialogue: "Press 1 time!",
+        buttonText:"CLICK",
+        duration: 5,
+        onClick: () => {
+            if(stageClicks >= 1) nextStage()
+        }
     },
 
     {
@@ -185,6 +193,23 @@ const stages = [
         duration: 10,
         onClick: () => nextStage(),
         onTimeout: () => nextStage()
+    },
+    {
+        dialogue: "Fast 5 Clicks!",
+        buttonText: "CLICK",
+        duration: 8,
+        onClick: () => {
+            if (stageClicks >= 5) nextStage()
+        }
+
+    },
+    {
+        dialogue: "Whatever you do, absolutely CLICK THE BUTTON NOW!",
+        buttonText: "CLICK",
+        duration: 5,
+        onClick: () => {
+            if(stageClicks >= 1) nextStage()
+        }
     },
     {
         //stage 10 = user must type the number that he remember minus other random number (equation)
@@ -341,7 +366,7 @@ function triggerFinalStageMath() {
             interactionArea.innerHTML = `<p style='color: #10b981; font-weight: bold; font-size: 1.5rem;'>Brilliant memory!</p>`
             playSound('win')
         } else {
-            triggerGameOver(`Wrong! The answer was ${correctAnswer}.`)
+            triggerGameOver(`Wrong! The Number was ${secretNumber}, And The Ansawer is ${correctAnswer},`)
         }
     })
 }
